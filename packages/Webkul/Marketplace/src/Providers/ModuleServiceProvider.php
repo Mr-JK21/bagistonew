@@ -1,0 +1,35 @@
+<?php
+
+namespace Webkul\Marketplace\Providers;
+
+use Konekt\Concord\BaseModuleServiceProvider;
+
+class ModuleServiceProvider extends BaseModuleServiceProvider
+{
+    protected $models = [
+        \Webkul\Marketplace\Models\Communication::class,
+        \Webkul\Marketplace\Models\CommunicationMessage::class,
+        \Webkul\Marketplace\Models\Invoice::class,
+        \Webkul\Marketplace\Models\InvoiceItem::class,
+        \Webkul\Marketplace\Models\MpFlagReason::class,
+        \Webkul\Marketplace\Models\MpFlagReasonTranslation::class,
+        \Webkul\Marketplace\Models\MpProductDownloadableLink::class,
+        \Webkul\Marketplace\Models\MpProductDownloadableSample::class,
+        \Webkul\Marketplace\Models\Order::class,
+        \Webkul\Marketplace\Models\OrderItem::class,
+        \Webkul\Marketplace\Models\Product::class,
+        \Webkul\Marketplace\Models\ProductFlag::class,
+        \Webkul\Marketplace\Models\ProductImage::class,
+        \Webkul\Marketplace\Models\ProductVideo::class,
+        \Webkul\Marketplace\Models\Refund::class,
+        \Webkul\Marketplace\Models\RefundItem::class,
+        \Webkul\Marketplace\Models\Review::class,
+        \Webkul\Marketplace\Models\Role::class,
+        \Webkul\Marketplace\Models\Seller::class,
+        \Webkul\Marketplace\Models\SellerCategory::class,
+        \Webkul\Marketplace\Models\SellerFlag::class,
+        \Webkul\Marketplace\Models\Shipment::class,
+        \Webkul\Marketplace\Models\ShipmentItem::class,
+        \Webkul\Marketplace\Models\Transaction::class,
+    ];
+}
