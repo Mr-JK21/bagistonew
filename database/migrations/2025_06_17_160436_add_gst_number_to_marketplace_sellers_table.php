@@ -13,8 +13,7 @@ return new class extends Migration
     {
         Schema::table('marketplace_sellers', function (Blueprint $table) {
             //
-            $table->string('aadhar_card')->nullable();
-            
+            $table->string('gst_number')->nullable()->after('pan');
 
         });
     }
@@ -26,8 +25,8 @@ return new class extends Migration
     {
         Schema::table('marketplace_sellers', function (Blueprint $table) {
             //
-            $table->dropColumn('aadhar_card');
-            
+            $table->dropColumn('gst_number');
+
         });
     }
 };

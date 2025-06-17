@@ -1045,7 +1045,7 @@ return [
             'button-title'        => 'Sign In',
             'create-your-account' => 'Create your account',
             'email'               => 'Email',
-            'footer'              => '© Copyright 2010 - :current_year, Webkul Software (Registered in India). All rights reserved.',
+            'footer'           => '© Copyright 2025 - :current_year, Mr. JK Software (Registered in India). All rights reserved.',
             'forgot-pass'         => 'Forgot Password?',
             'form-login-text'     => 'If you have an account, sign in with your email address.',
             'invalid-credentials' => 'Please check your credentials and try again.',
@@ -1059,17 +1059,27 @@ return [
         ],
 
         'signup' => [
+
+            'aadhar-card'      => 'Aadhar Card Number', //added 17th june2025
             'account-exists'   => 'Already have an account ?',
             'bagisto'          => 'Bagisto',
             'button-title'     => 'Register',
+            'city'             => 'City', //added 17th june2025
             'confirm-pass'     => 'Confirm Password',
+            'country'          => 'Country', //added 17th june2025
             'email'            => 'Email',
-            'footer'           => '© Copyright 2010 - :current_year, Webkul Software (Registered in India). All rights reserved.',
+            'footer'           => '© Copyright 2025 - :current_year, Mr. JK Software (Registered in India). All rights reserved.',
             'form-signup-text' => 'If you are new to our store, we glad to have you as member.',
+            'gst-number'       => 'GST Number', //added 17th june2025
             'name'             => 'Name',
             'page-title'       => 'Become Seller',
+            'pan-card'         => 'PAN Card Number', //added 17th june2025
             'password'         => 'Password',
+            'phone-number'     => 'Phone Number', //added 17th june2025
+            'select-country'   => 'Select Country', //added 17th june2025
+            'select-state'     => 'Select State', //added 17th june2025
             'sign-in-button'   => 'Sign In',
+            'state'            => 'State', //added 17th june2025
             'success'          => 'Account created successfully.',
             'url'              => 'Shop Url',
         ],
@@ -1079,7 +1089,7 @@ return [
             'bagisto'              => 'Bagisto',
             'email'                => 'Email',
             'email-not-exist'      => 'We cannot find a user with that email address.',
-            'footer'               => '© Copyright 2010 - :current_year, Webkul Software (Registered in India). All rights reserved.',
+            'footer'           => '© Copyright 2025 - :current_year, Mr. JK Software (Registered in India). All rights reserved.',
             'forgot-password-text' => 'If you forgot your password, recover it by entering your email address.',
             'page-title'           => 'Forgot your password ?',
             'reset-link-sent'      => 'We have e-mailed your reset password link.',
@@ -1093,7 +1103,7 @@ return [
             'bagisto'          => 'Bagisto',
             'confirm-password' => 'Confirm Password',
             'email'            => 'Registered Email',
-            'footer'           => '© Copyright 2010 - :current_year, Webkul Software (Registered in India). All rights reserved.',
+            'footer'           => '© Copyright 2025 - :current_year, Mr. JK Software (Registered in India). All rights reserved.',
             'password'         => 'Password',
             'submit-btn-title' => 'Reset Password',
             'title'            => 'Reset Password',

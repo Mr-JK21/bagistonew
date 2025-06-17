@@ -3,6 +3,7 @@
 namespace Webkul\Marketplace\Http\Controllers\Seller;
 
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 use Webkul\Core\Rules\Slug;
 use Webkul\Marketplace\Repositories\SellerRepository;
@@ -33,13 +34,21 @@ class RegistrationController extends Controller
      */
     public function store()
     {
-        $data = $this->validate(request(), [
-            'name'     => ['required'],
-            'email'    => ['required', 'email', 'unique:marketplace_sellers,email'],
-            'url'      => ['required', 'unique:marketplace_sellers,url', 'lowercase', new Slug],
-            'password' => ['required', 'confirmed', 'min:6'],
-        ]);
+        // Log the incoming request data for debugging
+    Log::info('Seller Register Request', [request()->toArray()]);
 
+    // Validate the form inputs
+    $data = request()->validate([
+        'name'        => ['required'],
+        'email'       => ['required', 'email', 'unique:marketplace_sellers,email'],
+        'url'         => ['required', 'unique:marketplace_sellers,url', 'lowercase', new Slug],
+        'password'    => ['required', 'confirmed', 'min:6'],
+        'phone'       => ['required'],
+        'aadhar'      => ['required'],
+        'pan'         => ['required'], // standard PAN format
+        'gst_number'  => ['nullable'], // standard GST format
+    ]);
+    
         $this->sellerRepository->create($data);
 
         return to_route('seller.session.index')
