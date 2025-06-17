@@ -541,6 +541,48 @@
                                 </x-admin::form.control-group>
                             </div>
 
+                            {{-- 6 May 2025 --}}
+                            <div class="flex gap-4 max-sm:flex-wrap">
+                                <!-- Aadhar -->
+                                <x-admin::form.control-group class="w-full">
+                                    <x-admin::form.control-group.label class="required">
+                                        @lang('marketplace::app.admin.sellers.index.create.aadhar')
+                                    </x-admin::form.control-group.label>
+                            
+                                    <x-admin::form.control-group.control
+                                        type="text"
+                                        name="aadhar"
+                                        id="aadhar"
+                                        rules="required|digits:12"
+                                        style="text-transform: uppercase;"
+                                        :label="trans('marketplace::app.admin.sellers.index.create.aadhar')"
+                                        :placeholder="trans('marketplace::app.admin.sellers.index.create.aadhar')"
+                                    />
+                            
+                                    <x-admin::form.control-group.error control-name="aadhar" />
+                                </x-admin::form.control-group>
+                            
+                                <!-- Pan -->
+                                <x-admin::form.control-group class="w-full">
+                                    <x-admin::form.control-group.label class="required">
+                                        @lang('marketplace::app.admin.sellers.index.create.pan')
+                                    </x-admin::form.control-group.label>
+                            
+                                    <x-admin::form.control-group.control
+                                        type="text"
+                                        name="pan"
+                                        id="pan"
+                                        rules="required|min:10|max:10"
+                                        style="text-transform: uppercase;"
+                                        :label="trans('marketplace::app.admin.sellers.index.create.pan')"
+                                        :placeholder="trans('marketplace::app.admin.sellers.index.create.pan')"
+                                    />
+                            
+                                    <x-admin::form.control-group.error control-name="pan" />
+                                </x-admin::form.control-group>
+                            </div>
+                            
+
                             {!! view_render_event('marketplace.admin.sellers.index.create_form_controls.after') !!}
                         </x-slot:content>
                         

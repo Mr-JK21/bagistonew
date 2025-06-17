@@ -3,7 +3,9 @@
 namespace Webkul\Marketplace\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Webkul\Core\Rules\AadharNumber;
 use Webkul\Core\Rules\PhoneNumber;
+use Webkul\Core\Rules\PanNumber;
 use Webkul\Core\Rules\Slug;
 
 class SellerFormRequest extends FormRequest
@@ -25,6 +27,7 @@ class SellerFormRequest extends FormRequest
             'shop_title'             => ['required'],
             'banner.*'               => ['nullable', 'mimes:bmp,jpeg,jpg,png,webp'],
             'logo.*'                 => ['nullable', 'mimes:bmp,jpeg,jpg,png,webp'],
+            'aadhar_card_pdf'        => ['nullable', 'mimes:pdf'],
             'meta_title'             => ['nullable'],
             'meta_description'       => ['nullable'],
             'meta_keywords'          => ['nullable'],
@@ -44,6 +47,8 @@ class SellerFormRequest extends FormRequest
             'facebook'               => ['nullable'],
             'linkedin'               => ['nullable'],
             'pinterest'              => ['nullable'],
+            'aadhar'                 => ['nullable', "$unique,aadhar,".($sellerId ?? ''), new AadharNumber],
+            'pan'                    => ['nullable', "$unique,pan,".($sellerId ?? ''), new PanNumber],
         ];
 
         if ($this->isMethod('put')) {
@@ -58,7 +63,13 @@ class SellerFormRequest extends FormRequest
 
         return $rules;
     }
-
+    public function messages()
+    {
+        return [
+            'pan.regex' => 'Invalid PAN format (Example: ABCDE1234F).',
+            'aadhar.digits' => 'Aadhar must be exactly 12 digits.',
+        ];
+    }
     /**
      * Attributes.
      *
@@ -68,6 +79,8 @@ class SellerFormRequest extends FormRequest
     {
         return [
             'address.0' => 'address',
+            'aadhar' => 'Aadhar number',
+            'pan' => 'PAN number',
         ];
     }
 }

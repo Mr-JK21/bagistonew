@@ -2,23 +2,24 @@
 
 namespace Webkul\Marketplace\Http\Controllers\Admin;
 
+use Illuminate\View\View;
 use Illuminate\Http\JsonResponse;
+use Webkul\Marketplace\Enums\Order;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\View\View;
-use Webkul\Admin\Http\Requests\MassDestroyRequest;
+use Illuminate\Support\Facades\Storage;
 use Webkul\Admin\Http\Requests\MassUpdateRequest;
+use Webkul\Admin\Http\Requests\MassDestroyRequest;
+use Webkul\Marketplace\Repositories\OrderRepository;
+use Webkul\Marketplace\Mail\SellerDeleteNotification;
+use Webkul\Marketplace\Repositories\SellerRepository;
 use Webkul\Marketplace\DataGrids\Admin\SellerDataGrid;
-use Webkul\Marketplace\DataGrids\Admin\SellerFlagsDataGrid;
-use Webkul\Marketplace\Enums\Order;
-use Webkul\Marketplace\Http\Requests\ProductFromRequest;
+use Webkul\Marketplace\Repositories\ProductRepository;
 use Webkul\Marketplace\Http\Requests\SellerFormRequest;
 use Webkul\Marketplace\Mail\SellerApprovalNotification;
-use Webkul\Marketplace\Mail\SellerDeleteNotification;
-use Webkul\Marketplace\Repositories\OrderRepository;
-use Webkul\Marketplace\Repositories\ProductRepository;
-use Webkul\Marketplace\Repositories\SellerRepository;
+use Webkul\Marketplace\Http\Requests\ProductFromRequest;
+use Webkul\Marketplace\DataGrids\Admin\SellerFlagsDataGrid;
 use Webkul\Product\Repositories\ProductRepository as BaseProductRepository;
 
 class SellerController extends Controller
@@ -33,7 +34,8 @@ class SellerController extends Controller
         protected OrderRepository $orderRepository,
         protected ProductRepository $productRepository,
         protected BaseProductRepository $baseProductRepository
-    ) {}
+    ) {
+    }
 
     /**
      * Display a listing of the resource.
@@ -50,17 +52,48 @@ class SellerController extends Controller
     /**
      * Store a newly created resource in storage.
      */
+    // public function store(SellerFormRequest $request): JsonResponse
+    // {
+    //     $this->sellerRepository->create(array_merge($request->validated(), [
+    //         'password' => rand(100000, 10000000),
+    //         'address'  => implode(PHP_EOL, request('address')),
+    //     ]));
+
+    //     return new JsonResponse([
+    //         'message' => trans('marketplace::app.admin.sellers.index.create.success'),
+    //     ]);
+    // }
+
+    // 6 May 2025
     public function store(SellerFormRequest $request): JsonResponse
     {
-        $this->sellerRepository->create(array_merge($request->validated(), [
+
+        // Retrieve the validated data from the request
+        $validatedData = $request->validated();
+
+        // Convert the 'pan' field to uppercase
+        if (isset($validatedData['pan'])) {
+            $validatedData['pan'] = strtoupper($validatedData['pan']);
+        }
+
+        // Handle Aadhaar Card upload
+        if ($request->hasFile('aadhar_card')) {
+            $path = $request->file('aadhar_card')->store('aadhar_cards', 'public');
+            $validatedData['aadhar_card'] = $path;
+        }
+
+        // dd($validatedData);
+        // Merge the rest of the validated data and other attributes, then create the seller
+        $this->sellerRepository->create(array_merge($validatedData, [
             'password' => rand(100000, 10000000),
-            'address'  => implode(PHP_EOL, request('address')),
+            'address' => implode(PHP_EOL, request('address')),
         ]));
 
         return new JsonResponse([
             'message' => trans('marketplace::app.admin.sellers.index.create.success'),
         ]);
     }
+
 
     /**
      * Show the form for editing the specified resource.
@@ -76,18 +109,19 @@ class SellerController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(SellerFormRequest $request, int $id): JsonResponse
+    public function update(SellerFormRequest $request, int $id)
     {
-        $this->sellerRepository->findOrFail($id);
+        // Modified on: 2025-05-21
 
+        $seller = $this->sellerRepository->findOrFail($id);
+// dd($request);
         $data = array_merge($request->validated(), [
-            'address'      => implode(PHP_EOL, request('address')),
+            'address' => implode(PHP_EOL, request('address')),
             'is_suspended' => empty(request('is_suspended')) ? 0 : request('is_suspended'),
         ]);
 
         if (empty($data['commission_enable'])) {
             $data['commission_enable'] = 0;
-
             $data['commission_percentage'] = 0;
         }
 
@@ -95,14 +129,36 @@ class SellerController extends Controller
             $data['allowed_product_types'] = null;
         }
 
+        // ✅ Upload Aadhar PDF if provided
+        if ($request->hasFile('aadhar_card')) {
+            $file = $request->file('aadhar_card');
+            $fileName = time() . '_' . $file->getClientOriginalName();
+            $path = 'seller/documents/' . $seller->id;
+            // Delete old file if needed
+            Storage::delete($seller->aadhar_card);
+            $file->storeAs($path, $fileName, 'public');
+
+            // ✅ Save the aadhar path directly into the $data array
+            $data['aadhar_card'] = $path . '/' . $fileName;
+        }
+
+        // ✅ Update seller with final data
         $this->sellerRepository->update($data, $id);
 
         session()->flash('success', trans('marketplace::app.admin.sellers.edit.update-success'));
 
+        // 🔁 Changed from JSON response to redirect (2025-05-21)
+        return redirect()->route('admin.marketplace.sellers.index');
+
+        /*
+        // 🔁 Old code (JSON response)
         return new JsonResponse([
             'redirect_url' => route('admin.marketplace.sellers.index'),
         ]);
+        */
     }
+
+
 
     /**
      * Remove the specified resource from storage.
@@ -243,7 +299,7 @@ class SellerController extends Controller
     {
         $seller = $this->sellerRepository->findOrFail($id);
 
-        if (! $seller->is_profile_completed) {
+        if (!$seller->is_profile_completed) {
             return back()->with('warning', trans('marketplace::app.admin.sellers.index.incomplete-profile'));
         }
 
@@ -254,11 +310,11 @@ class SellerController extends Controller
 
             foreach ($products as $row) {
                 $results[] = [
-                    'id'              => $row->id,
-                    'sku'             => $row->sku,
-                    'name'            => $row->name,
+                    'id' => $row->id,
+                    'sku' => $row->sku,
+                    'name' => $row->name,
                     'formatted_price' => core()->formatBasePrice($row->getTypeInstance()->getMinimalPrice()),
-                    'base_image'      => $row->images->first()
+                    'base_image' => $row->images->first()
                         ? $row->images->first()->url
                         : null,
                 ];
@@ -280,7 +336,7 @@ class SellerController extends Controller
         $baseProduct = $this->baseProductRepository->findOrFail($productId);
 
         $product = $this->productRepository->findOneWhere([
-            'product_id'            => $productId,
+            'product_id' => $productId,
             'marketplace_seller_id' => $sellerId,
         ]);
 
@@ -288,7 +344,7 @@ class SellerController extends Controller
             return back()->with('error', trans('marketplace::app.admin.sellers.assign-product.already-selling'));
         }
 
-        if (! $this->sellerRepository->getAllowedProducts($seller)->has($baseProduct->type)) {
+        if (!$this->sellerRepository->getAllowedProducts($seller)->has($baseProduct->type)) {
             return back()->with('error', trans('marketplace::app.admin.sellers.assign-product.product-not-allowed', [
                 'type' => trans(config('product_types')[$baseProduct->type]['name']),
             ]));
@@ -296,8 +352,8 @@ class SellerController extends Controller
 
         return view('marketplace::admin.sellers.products.assign')
             ->with([
-                'baseProduct'   => $baseProduct,
-                'seller'        => $seller,
+                'baseProduct' => $baseProduct,
+                'seller' => $seller,
                 'totalProducts' => $this->productRepository->getTotalProducts($seller, true),
             ]);
     }
@@ -308,7 +364,7 @@ class SellerController extends Controller
     public function saveAssignProduct(ProductFromRequest $request, int $sellerId, int $productId): RedirectResponse
     {
         $product = $this->productRepository->findOneWhere([
-            'product_id'            => $productId,
+            'product_id' => $productId,
             'marketplace_seller_id' => $sellerId,
         ]);
 
@@ -317,7 +373,7 @@ class SellerController extends Controller
         }
 
         $this->productRepository->createAssign(array_merge($request->all(), [
-            'product_id'            => $productId,
+            'product_id' => $productId,
             'marketplace_seller_id' => $sellerId,
         ]));
 

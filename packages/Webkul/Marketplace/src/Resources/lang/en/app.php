@@ -173,6 +173,8 @@ return [
                     'state'          => 'State',
                     'success'        => 'Seller Created Successfully.',
                     'title'          => 'Create Seller',
+                    'aadhar'         => 'Aadhar Number',
+                    'pan'         => 'PAN Number',
                 ],
 
                 'datagrid' => [
@@ -354,6 +356,7 @@ return [
 
                 'profile' => [
                     'banner'         => 'Profile Banner',
+                    'aadhar'         => 'Aadhar Upload',
                     'banner-size'    => 'Banner size should be like 300px X 200px',
                     'logo'           => 'Profile Logo',
                     'logo-size'      => 'Logo size should be like 125px X 125px',
@@ -947,8 +950,8 @@ return [
 
                 'documents' => [
                     'add-document-btn'  => 'Add Document',
-                    'allowed-types'     => ':types',
-                    'not-allowed-error' => 'Only document files (:types ..) are allowed.',
+                    'allowed-types'     => 'pdf',
+                    'not-allowed-error' => 'Only document files (pdf) are allowed.',
                 ],
 
                 'placeholders' => [

@@ -101,6 +101,15 @@
 
             {!! view_render_event('bagisto.shop.components.layouts.header.desktop.bottom.compare.before') !!}
 
+            <!-- Become a Seller Button -->
+                <a
+                    href="{{ route('shop.marketplace.index') }}"
+                    class="text-base font-medium text-black bg-primary-600 hover:bg-primary-700 px-4 py-2 rounded-md transition-colors duration-300"
+                    aria-label="@lang('shop::app.components.layouts.header.become-a-seller')"
+                >
+                    @lang('shop::app.components.layouts.header.become-a-seller')
+                </a>
+
             <!-- Compare -->
             @if(core()->getConfigData('catalog.products.settings.compare_option'))
                 <a
@@ -123,10 +132,10 @@
                 @include('shop::checkout.cart.mini-cart')
             @endif
 
-            {!! view_render_event('bagisto.shop.components.layouts.header.desktop.bottom.mini_cart.after') !!}
+         {{--   {!! view_render_event('bagisto.shop.components.layouts.header.desktop.bottom.mini_cart.after') !!}
 
             {!! view_render_event('bagisto.shop.components.layouts.header.desktop.bottom.profile.before') !!}
-
+--}}
             <!-- user profile -->
             <x-shop::dropdown position="bottom-{{ core()->getCurrentLocale()->direction === 'ltr' ? 'right' : 'left' }}">
                 <x-slot:toggle>
@@ -154,7 +163,7 @@
                         <p class="py-2px mt-3 w-full border border-zinc-200"></p>
 
                         {!! view_render_event('bagisto.shop.components.layouts.header.desktop.bottom.customers_action.before') !!}
-                        
+
                         <div class="mt-6 flex gap-4">
                             {!! view_render_event('bagisto.shop.components.layouts.header.desktop.bottom.sign_in_button.before') !!}
 
@@ -171,7 +180,7 @@
                             >
                                 @lang('shop::app.components.layouts.header.sign-up')
                             </a>
-                            
+
                             {!! view_render_event('bagisto.shop.components.layouts.header.desktop.bottom.sign_up_button.after') !!}
                         </div>
 

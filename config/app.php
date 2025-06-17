@@ -238,6 +238,7 @@ return [
         Webkul\Theme\Providers\ThemeServiceProvider::class,
         Webkul\User\Providers\UserServiceProvider::class,
         Webkul\Marketplace\Providers\MarketplaceServiceProvider::class,
+        Webkul\NewTheme\Providers\NewThemeServiceProvider::class,
     ])->toArray(),
 
     /*

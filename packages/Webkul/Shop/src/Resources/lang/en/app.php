@@ -394,6 +394,7 @@ return [
             'header' => [
                 'account'           => 'Account',
                 'bagisto'           => 'Bagisto',
+                'become-a-seller'   => 'Become a Seller',
                 'cart'              => 'Cart',
                 'compare'           => 'Compare',
                 'dropdown-text'     => 'Manage Cart, Orders & Wishlist',
