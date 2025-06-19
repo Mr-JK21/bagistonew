@@ -21,6 +21,8 @@ use Webkul\Marketplace\Mail\SellerApprovalNotification;
 use Webkul\Marketplace\Http\Requests\ProductFromRequest;
 use Webkul\Marketplace\DataGrids\Admin\SellerFlagsDataGrid;
 use Webkul\Product\Repositories\ProductRepository as BaseProductRepository;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 
 class SellerController extends Controller
 {
@@ -48,6 +50,22 @@ class SellerController extends Controller
 
         return view('marketplace::admin.sellers.index');
     }
+
+
+    // 19th June 2025
+    public function verifyGST(Request $request)
+    {
+        $gstNo = $request->query('gstNo');
+        $keySecret = config('services.appyflow.key_secret');
+            $response = Http::get('https://appyflow.in/api/verifyGST', [
+            'gstNo' => $gstNo,
+            'key_secret' => $keySecret
+        ]);
+        dd($response);
+        return $response->json();
+        
+    }
+    // __
 
     /**
      * Store a newly created resource in storage.

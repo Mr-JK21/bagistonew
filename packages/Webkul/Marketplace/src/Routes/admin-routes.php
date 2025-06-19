@@ -41,6 +41,11 @@ Route::prefix(config('app.admin_url').'/marketplace')
 
                 Route::get('flags/{id}', 'flags')->name('flags.index');
 
+                // 19th June 2025
+                // New GST Verification Route
+                Route::get('gst/verify', 'verifyGST')->name('gst.verify');
+                // __
+                
                 Route::prefix('product')
                     ->group(function () {
                         Route::get('search/{id}', 'search')->name('products.search');

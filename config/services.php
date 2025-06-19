@@ -79,4 +79,10 @@ return [
         'client_secret' => env('GITHUB_CLIENT_SECRET'),
         'redirect'      => env('GITHUB_CALLBACK_URL'),
     ],
+
+    // 19th June 2025
+    'appyflow' => [
+        'key_secret' => env('APPYFLOW_KEY_SECRET')
+    ]
+    // __
 ];
