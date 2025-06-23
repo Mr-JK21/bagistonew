@@ -53,6 +53,9 @@ Route::middleware(['theme', 'locale', 'currency', 'marketplace'])->group(functio
                     Route::get('top-selling/{sellerId}', 'topSellingProducts')->name('seller.top_selling');
                 });
 
+
+                
+
             /**
              * ----------------------------------------------------------------
              * Seller related routes.
@@ -61,15 +64,24 @@ Route::middleware(['theme', 'locale', 'currency', 'marketplace'])->group(functio
             Route::name('sellers.')
                 ->controller(SellerController::class)
                 ->group(function () {
-                    Route::get('{url}', 'show')->name('show');
 
                     Route::post('contact/{url}', 'contact')->name('contact');
 
                     Route::post('flag/{url}', 'flag')->name('flag');
 
                     Route::get('products/{url}', 'products')->name('products');
-                });
 
+                    Route::get('gst/verify', 'verifyGST')->name('gst.verify');
+
+                    Route::post('phone/verify', 'verifyPhone')->name('phone.verify');
+
+                    Route::get('{url}', 'show')->name('show');
+
+                    
+                });
+                Route::get('test-json', function () {
+                    return response()->json(['success' => true]);
+                });
             /**
              * ----------------------------------------------------------------
              * Product flag routes.

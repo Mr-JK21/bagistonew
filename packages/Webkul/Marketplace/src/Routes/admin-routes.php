@@ -16,6 +16,9 @@ Route::prefix(config('app.admin_url').'/marketplace')
     ->name('admin.marketplace.')
     ->middleware(['admin', 'marketplace'])
     ->group(function () {
+        
+        
+        
         /**
          * ----------------------------------------------------
          * All the sellers routes will be defined here
@@ -25,6 +28,9 @@ Route::prefix(config('app.admin_url').'/marketplace')
             ->name('sellers.')
             ->controller(SellerController::class)
             ->group(function () {
+
+                // Route::get('gst/verify', 'verifyGST')->name('gst.verify');
+
                 Route::get('', 'index')->name('index');
 
                 Route::post('create', 'store')->name('store');
@@ -43,7 +49,9 @@ Route::prefix(config('app.admin_url').'/marketplace')
 
                 // 19th June 2025
                 // New GST Verification Route
-                Route::get('gst/verify', 'verifyGST')->name('gst.verify');
+                // Route::get('/sellers/gst/verify', 'verifyGST')->name('sellers.gst.verify');
+                // Route::get('/sellers/gst/verify', [SellerController::class, 'verifyGST'])->name('admin.sellers.gst.verify');
+
                 // __
                 
                 Route::prefix('product')

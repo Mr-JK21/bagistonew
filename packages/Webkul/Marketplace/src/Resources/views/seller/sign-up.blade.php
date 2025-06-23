@@ -1,7 +1,7 @@
 <!-- SEO Meta Content -->
 @push('meta')
 <meta name="description" content="@lang('marketplace::app.seller.signup.page-title')" />
-
+<meta name="csrf-token" content="{{ csrf_token() }}">
 <meta name="keywords" content="@lang('marketplace::app.seller.signup.page-title')" />
 @endPush
 
@@ -77,6 +77,7 @@
 
                                     <x-shop::form.control-group.control type="text" id="phone" name="phone"
                                         class="rounded-lg !p-[20px_25px]" pattern="[0-9]{10}" maxlength="10"
+                                        
                                         :value="old('phone')"
                                         :label="trans('marketplace::app.seller.signup.phone-number')"
                                         :placeholder="trans('marketplace::app.seller.signup.phone-number')"
@@ -308,10 +309,14 @@
                                         type="button"
                                         id="validate-gst"
                                         class="primary-button rounded-2xl px-6 py-4 text-base"
-                                        disabled
+                                        {{-- onclick="validateGST()" --}}
                                         >
-                                        Validate GST Number
+                                        Validate
                                     </button>
+                                    <button 
+                                    type="button"
+                                    onclick="validatePhone()">Phone</button>
+
                                     </div>
                                         <x-shop::form.control-group.error control-name="gst_number" />
                                 </x-shop::form.control-group>
@@ -367,65 +372,79 @@
             {!! view_render_event('bagisto.seller.sign_up.footer.after') !!}
         </div>
 
-        @push('scripts')
+
+    @push('scripts')
     {!! Captcha::renderJS() !!}
-    <script>
-        document.getElementById('validate-gst').addEventListener('click', async function () {
-            const gstNumber = document.getElementById('gst_number').value;
-            const validateButton = this;
+    @push('scripts')
+<script>
+    // 20th June 2025
+    async function validatePhone(){
+        const phno = document.getElementById('phone')?.value;
 
-            if (!gstNumber) {
-                alert('Please enter a GST number to validate.');
-                return;
-            }
+if (!phno) {
+    alert('Please enter a Phone number to validate.');
+    return;
+} 
 
-            // Disable button to prevent multiple clicks
-            validateButton.disabled = true;
-            validateButton.textContent = 'Validating...';
+// Validate Phone
+const phoneResponse = await fetch('/marketplace/phone/verify', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                        },
+                        body: JSON.stringify({ phone: phno })
+                    });
+                    const phoneData = await phoneResponse.json();
+                    console.log(phoneData);
+                    // ---------------------------------------------
 
-            try {
-                // Call server-side Laravel route for GST verification
-                const response = await fetch(`/sellers/gst/verify?gstNo=${encodeURIComponent(gstNumber)}`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                    }
-                });
+}
 
-                const data = await response.json();
 
-                if (response.ok && !data.error) {
-                    // Extract relevant fields from taxpayerInfo
-                    const { lgnm, tradeNam } = data.taxpayerInfo;
 
-                    // Auto-fill form fields
-                    if (lgnm || tradeNam) {
-                        document.getElementById('name').value = tradeNam || lgnm; // Prefer trade name, fallback to legal name
-                    }
-                    // Note: Phone and email are not provided by AppyFlow API in the example response.
-                    // If available via server-side logic, add here:
-                    // document.getElementById('phone').value = data.taxpayerInfo.phone || '';
-                    // document.getElementById('email').value = data.taxpayerInfo.email || '';
+    async function validateGST() {
+        const gstNumber = document.getElementById('gst_number')?.value;
 
-                    alert('GST number validated successfully!');
-                } else {
-                    alert(data.message || 'Invalid GST number or API error.');
+        if (!gstNumber) {
+            alert('Please enter a GST number to validate.');
+            return;
+        }
+
+        try {
+            const response = await fetch(`/marketplace/gst/verify?gstNo=${encodeURIComponent(gstNumber)}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                 }
-            } catch (error) {
-                console.error('GST Validation Error:', error);
-                alert('Failed to validate GST number. Please try again later.');
-            } finally {
-                // Re-enable button
-                validateButton.disabled = false;
-                validateButton.textContent = 'Validate GST Number';
-            }
-        });
+            });
 
-        // Enable/disable Validate button based on GST number input
-        document.getElementById('gst_number').addEventListener('input', function () {
-            document.getElementById('validate-gst').disabled = !this.value;
-        });
-    </script>
+            const data = await response.json();
+
+
+            if (response.ok && !data.error) {
+                const { lgnm, tradeNam } = data.taxpayerInfo || {};
+
+                if (lgnm || tradeNam) {
+                    const nameField = document.getElementById('name');
+                    if (nameField) {
+                        nameField.value = tradeNam || lgnm;
+                    }
+                }
+
+                alert('GST number validated successfully!');
+            } else {
+                alert(data.message || 'Invalid GST number.');
+            }
+        } catch (error) {
+            console.error('GST Validation Error:', error);
+            alert('Failed to validate GST number. Please try again later.');
+        }
+    }
+</script>
+@endpush
+
+
 @endpush
 </x-shop::layouts>

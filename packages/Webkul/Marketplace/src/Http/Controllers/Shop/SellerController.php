@@ -19,6 +19,7 @@ use Webkul\Marketplace\Repositories\SellerFlagRepository;
 use Webkul\Marketplace\Repositories\SellerRepository;
 use Webkul\Shop\Http\Controllers\Controller;
 use Webkul\Shop\Http\Resources\ProductResource;
+use Illuminate\Support\Facades\Http;
 
 class SellerController extends Controller
 {
@@ -38,6 +39,103 @@ class SellerController extends Controller
     /**
      * Display the specified resource.
      */
+
+    // 19th June 2025
+    // public function verifyGST(Request $request)
+    // {
+    //     $gstNo = $request->query('gstNo');
+    //     $keySecret = config('services.appyflow.key_secret');
+
+    //     $response = Http::get('https://appyflow.in/api/verifyGST', [
+    //         'gstNo'      => $gstNo,
+    //         'key_secret' => $keySecret
+    //     ]);
+
+    //     return $response->json();
+    // }
+
+    // 20th June 2025
+    public function verifyGST(Request $request)
+{
+    $gstNo = $request->query('gstNo');
+    // $keySecret = config('services.appyflow.key_secret');
+    $keySecret = "KfR0yU5ZVihwakIHe2Bq5vAnchd2";
+
+    try {
+        // $postdata=[
+        //     'gstNo' => $gstNo,
+        //     'key_secret' => $keySecret
+        // ];
+        // dd($postdata);
+        $response = Http::get('https://appyflow.in/api/verifyGST', [
+            'gstNo' => $gstNo,
+            'key_secret' => $keySecret
+        ]);
+
+        $data = $response->json();
+
+        if ($response->ok() && !isset($data['error'])) {
+            $taxpayerInfo = $data['taxpayerInfo'] ?? [];
+            return response()->json([
+                'success' => true,
+                'lgnm' => $taxpayerInfo['lgnm'] ?? null, // Legal name for 'name' field
+                'tradeNam' => $taxpayerInfo['tradeNam'] ?? null // Trade name for 'shopurl' field
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => $data['message'] ?? 'Invalid GST number.'
+            ], 400);
+        }
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to validate GST number. Please try again later.'
+        ], 500);
+    }
+}
+
+
+public function verifyPhone(Request $request)
+    {
+        $phone = $request->input('phone');
+        $apiToken = 'T1gwenp5MkVIcjZ0VFY4OGlLLjYwM2ZjODhhOTkxY2QwODgyYjlkZTNiNTJhMWRkMDhhOmQ2NTA4NDgzNWJlYTgxZmExMTRiYTJhODI2YWI5NWY3MDUyZTdlNWZjOWVhMjYzNQ==';
+
+        try {
+            $response = Http::withHeaders([
+                'Content-Type' => 'application/json',
+                'Authorization' => 'Basic ' . $apiToken
+            ])->post('https://api.attestr.com/api/v2/public/checkx/contact', [
+                'number' => $phone,
+            ]);
+
+            dd($response->body());
+            $data = $response->json();
+
+            if ($response->ok() && isset($data['status']) && $data['status'] === 'success') {
+                return response()->json([
+                    'success' => true,
+                    'valid' => $data['valid'] ?? false,
+                    'message' => $data['message'] ?? 'Phone number validated.'
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => $data['message'] ?? 'Invalid phone number.'
+                ], $response->status());
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to validate phone number: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    // __
+    
+    // marketplace/src/http/controllers/shop/sellercontroller.php
+
     public function show(string $url): View|RedirectResponse
     {
         $seller = $this->sellerRepository->withCount('flags')->findByUrlOrFail($url);

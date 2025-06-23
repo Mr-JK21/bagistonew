@@ -52,20 +52,7 @@ class SellerController extends Controller
     }
 
 
-    // 19th June 2025
-    public function verifyGST(Request $request)
-    {
-        $gstNo = $request->query('gstNo');
-        $keySecret = config('services.appyflow.key_secret');
-            $response = Http::get('https://appyflow.in/api/verifyGST', [
-            'gstNo' => $gstNo,
-            'key_secret' => $keySecret
-        ]);
-        dd($response);
-        return $response->json();
-        
-    }
-    // __
+    
 
     /**
      * Store a newly created resource in storage.
@@ -112,6 +99,20 @@ class SellerController extends Controller
         ]);
     }
 
+        // 20th June 2025
+        // public function verifyGST(Request $request)
+        // {
+        //     $gstNo = $request->query('gstNo');
+        //     $keySecret = config('services.appyflow.key_secret');
+        //         $response = Http::get('https://appyflow.in/api/verifyGST', [
+        //         'gstNo' => $gstNo,
+        //         'key_secret' => $keySecret
+        //     ]);
+        //     dd($response->json());
+        //     return $response->json();
+            
+        // }
+        // __
 
     /**
      * Show the form for editing the specified resource.
